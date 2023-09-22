@@ -2,4 +2,14 @@
 
 
 #include "GameInstances/ShishaGameInstnace.h"
+#include "ShishaGameInstnace.h"
 
+#include "AbilitySystemGlobals.h"
+
+void UShishaGameInstnace::Init()
+{
+	Super::Init();
+
+	UAbilitySystemGlobals::Get().InitGlobalData();
+
+}
