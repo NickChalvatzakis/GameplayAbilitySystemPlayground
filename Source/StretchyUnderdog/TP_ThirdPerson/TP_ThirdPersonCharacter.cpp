@@ -88,7 +88,7 @@ bool ATP_ThirdPersonCharacter::ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEf
 
 void ATP_ThirdPersonCharacter::InitializeAttributes()
 {
-	if(GetLocalRole() == ROLE_Authority && DefaultAttributeSet && AttributeSet)
+	if(HasAuthority() && DefaultAttributeSet && AttributeSet)
 	{
 		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 		EffectContext.AddSourceObject(this);
@@ -110,7 +110,7 @@ void ATP_ThirdPersonCharacter::GiveAbilities()
 
 void ATP_ThirdPersonCharacter::ApplyStartupEffects()
 {
-	if(GetLocalRole() == ROLE_Authority)
+	if(HasAuthority())
 	{
 		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 		EffectContext.AddSourceObject(this);
