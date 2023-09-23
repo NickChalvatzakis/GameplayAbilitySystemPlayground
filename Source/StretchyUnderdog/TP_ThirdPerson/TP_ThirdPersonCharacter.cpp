@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TP_ThirdPersonCharacter.h"
+#include "TP_ThirdPersonCharacter.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -10,6 +11,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Components/ShishaAbilitySystemComponentBase.h"
+#include <AttributeSets/ShishaAttributeSetBase.h>
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -52,6 +58,85 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	// Create Ability System Component
+	AbilitySystemComponent = CreateDefaultSubobject<UShishaAbilitySystemComponentBase>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	AttributeSet = CreateDefaultSubobject<UShishaAttributeSetBase>(TEXT("AttributeSet"));
+}
+
+UAbilitySystemComponent* ATP_ThirdPersonCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+bool ATP_ThirdPersonCharacter::ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect,
+                                                         FGameplayEffectContextHandle InEffectContext)
+{
+	if(!Effect.Get()) return false;
+
+	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1, InEffectContext);
+	if(SpecHandle.IsValid())
+	{
+		const FActiveGameplayEffectHandle ActiveGameplayEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		return ActiveGameplayEffectHandle.WasSuccessfullyApplied();
+	}
+	return false;
+}
+
+void ATP_ThirdPersonCharacter::InitializeAttributes()
+{
+	if(GetLocalRole() == ROLE_Authority && DefaultAttributeSet && AttributeSet)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		ApplyGameplayEffectToSelf(DefaultAttributeSet, EffectContext);
+	}
+}
+
+void ATP_ThirdPersonCharacter::GiveAbilities()
+{
+	if(HasAuthority() && AbilitySystemComponent)
+	{
+		for (const TSubclassOf<UGameplayAbility>& DefaultAbility : DefaultAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(DefaultAbility));
+		}
+	}
+}
+
+void ATP_ThirdPersonCharacter::ApplyStartupEffects()
+{
+	if(GetLocalRole() == ROLE_Authority && DefaultAttributeSet && AttributeSet)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		for (const TSubclassOf<UGameplayEffect>& CharacterEffect : DefaultEffects)
+		{
+			ApplyGameplayEffectToSelf(CharacterEffect, EffectContext);
+		}
+
+	}
+}
+
+void ATP_ThirdPersonCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	InitializeAttributes();
+	ApplyStartupEffects();
+}
+
+void ATP_ThirdPersonCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	InitializeAttributes();
+
 }
 
 void ATP_ThirdPersonCharacter::BeginPlay()
