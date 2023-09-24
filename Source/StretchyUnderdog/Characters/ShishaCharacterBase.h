@@ -40,7 +40,7 @@ class STRETCHYUNDERDOG_API AShishaCharacterBase : public ACharacter, public IAbi
 
 public:
 	// Sets default values for this character's properties
-	AShishaCharacterBase();
+	AShishaCharacterBase(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PostInitializeComponents() override;
 

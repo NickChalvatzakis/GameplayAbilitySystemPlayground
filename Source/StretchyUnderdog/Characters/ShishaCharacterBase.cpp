@@ -17,10 +17,12 @@
 #include "DataAssets/CharacterDataAsset.h"
 #include "Net/UnrealNetwork.h"
 
-// Sets default values
-AShishaCharacterBase::AShishaCharacterBase()
+#include "Components/Actor/ShishaCharacterMovementComponent.h"
+
+AShishaCharacterBase::AShishaCharacterBase(const FObjectInitializer& ObjectInitializer) :
+Super(ObjectInitializer.SetDefaultSubobjectClass<UShishaCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
- 	// Set size for collision capsule
+	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
 	// Don't rotate when the controller rotates. Let that just affect the camera.
@@ -61,7 +63,6 @@ AShishaCharacterBase::AShishaCharacterBase()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<UShishaAttributeSetBase>(TEXT("AttributeSet"));
-
 }
 
 void AShishaCharacterBase::PostInitializeComponents()

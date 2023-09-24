@@ -3,6 +3,8 @@
 
 #include "AttributeSets/ShishaAttributeSetBase.h"
 #include "GameplayEffectExtension.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
 void UShishaAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -12,6 +14,18 @@ void UShishaAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectMod
 	if(Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	else if(Data.EvaluatedData.Attribute == GetMaxMovementSpeedAttribute())
+	{
+		const ACharacter* OwningCharacter = Cast<ACharacter>(GetOwningActor());
+		UCharacterMovementComponent* CharacterMovement = OwningCharacter ? OwningCharacter->GetCharacterMovement() : nullptr;
+		
+		if(CharacterMovement)
+		{
+			const float MaxSpeed = GetMaxMovementSpeed();
+
+			CharacterMovement->MaxWalkSpeed = MaxSpeed;
+		}
 	}
 }
 
@@ -25,10 +39,28 @@ void UShishaAttributeSetBase::OnRep_MaxHealth(const FGameplayAttributeData& OldM
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UShishaAttributeSetBase, MaxHealth, OldMaxHealth);
 }
 
+void UShishaAttributeSetBase::OnRep_Stamina(const FGameplayAttributeData& OldStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UShishaAttributeSetBase, Stamina, OldStamina);
+}
+
+void UShishaAttributeSetBase::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UShishaAttributeSetBase, MaxStamina, OldMaxStamina);
+}
+
+void UShishaAttributeSetBase::OnRep_MaxMovementSpeed(const FGameplayAttributeData& OldMaxMovementSpeed)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UShishaAttributeSetBase, MaxMovementSpeed, OldMaxMovementSpeed);
+}
+
 void UShishaAttributeSetBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UShishaAttributeSetBase, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UShishaAttributeSetBase, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UShishaAttributeSetBase, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UShishaAttributeSetBase, MaxStamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UShishaAttributeSetBase, MaxMovementSpeed, COND_None, REPNOTIFY_Always);
 }
