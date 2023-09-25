@@ -86,3 +86,18 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void ATP_ThirdPersonCharacter::PawnClientRestart()
+{
+	Super::PawnClientRestart();
+
+	if(APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if(UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			EnhancedInputSubsystem->ClearAllMappings();
+
+			EnhancedInputSubsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
