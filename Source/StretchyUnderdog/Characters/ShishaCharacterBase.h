@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/GameplayAbility.h"
-#include "AbilitySystemInterface.h"
 #include "ShishaTypes.h"
 #include "Logging/LogMacros.h"
 #include "GameFramework/Character.h"
+#include "Components/Actor/FootstepsComponent.h"
 #include "ShishaCharacterBase.generated.h"
 
 class USpringArmComponent;
@@ -78,6 +78,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterData(const FCharacterData& InCharacterData);
 
+	class UFootstepsComponent* GetFootstepsComponent() const;
+
 protected:
 	FCharacterData CharacterData;
 
@@ -90,4 +92,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UCharacterDataAsset* CharacterDataAsset;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UFootstepsComponent* FootstepsComponent;
 };

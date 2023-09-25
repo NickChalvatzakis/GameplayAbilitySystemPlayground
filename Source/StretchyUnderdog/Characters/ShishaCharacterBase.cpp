@@ -63,6 +63,8 @@ Super(ObjectInitializer.SetDefaultSubobjectClass<UShishaCharacterMovementCompone
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<UShishaAttributeSetBase>(TEXT("AttributeSet"));
+
+	FootstepsComponent = CreateDefaultSubobject<UFootstepsComponent>(TEXT("Footsteps Component"));
 }
 
 void AShishaCharacterBase::PostInitializeComponents()
@@ -153,6 +155,11 @@ void AShishaCharacterBase::SetCharacterData(const FCharacterData& InCharacterDat
 	CharacterData = InCharacterData;
 
 	InitFromCharacterData(CharacterData);
+}
+
+UFootstepsComponent* AShishaCharacterBase::GetFootstepsComponent() const
+{
+	return FootstepsComponent;
 }
 
 void AShishaCharacterBase::OnRep_CharacterData()
