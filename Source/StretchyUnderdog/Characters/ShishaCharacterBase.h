@@ -78,6 +78,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterData(const FCharacterData& InCharacterData);
 
+	void OnJumpActionStarted();
+	void OnJumpActionStopped();
+
+	/*virtual void Jump() override;*/
+
+	//Remove all effects with InAir tag
+	virtual void Landed(const FHitResult& Hit) override;
+
 	class UFootstepsComponent* GetFootstepsComponent() const;
 
 protected:
@@ -95,4 +103,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	class UFootstepsComponent* FootstepsComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag JumpEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagContainer InAirTags;
+
+
 };

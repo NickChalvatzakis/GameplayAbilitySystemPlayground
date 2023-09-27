@@ -18,6 +18,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "Components/Actor/ShishaCharacterMovementComponent.h"
+#include "AbilitySystemLog.h"
 
 AShishaCharacterBase::AShishaCharacterBase(const FObjectInitializer& ObjectInitializer) :
 Super(ObjectInitializer.SetDefaultSubobjectClass<UShishaCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -157,6 +158,20 @@ void AShishaCharacterBase::SetCharacterData(const FCharacterData& InCharacterDat
 	InitFromCharacterData(CharacterData);
 }
 
+void AShishaCharacterBase::OnJumpActionStarted()
+{
+	FGameplayEventData Payload;
+	Payload.Instigator = this;
+	Payload.EventTag = JumpEventTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, JumpEventTag, Payload);
+}
+
+void AShishaCharacterBase::OnJumpActionStopped()
+{
+	// StopJump();
+}
+
 UFootstepsComponent* AShishaCharacterBase::GetFootstepsComponent() const
 {
 	return FootstepsComponent;
@@ -176,5 +191,17 @@ void AShishaCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AShishaCharacterBase, CharacterData);
+}
+
+
+
+void AShishaCharacterBase::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RemoveActiveEffectsWithTags(InAirTags);
+	}
 }
 

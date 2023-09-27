@@ -13,5 +13,8 @@ UCLASS()
 class STRETCHYUNDERDOG_API UShishaCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
+
+public:
+	// virtual bool DoJump(bool bReplayingMoves) override;
 	
 };
