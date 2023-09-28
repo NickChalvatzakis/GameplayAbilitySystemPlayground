@@ -27,7 +27,4 @@ class STRETCHYUNDERDOG_API UGA_Jump : public UShishaGameplayAbility
 	UFUNCTION(BlueprintCallable, Category = "Ability")
 	void CharacterJumpStop();
 
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	TSubclassOf<UGameplayEffect> JumpEffect;
 };

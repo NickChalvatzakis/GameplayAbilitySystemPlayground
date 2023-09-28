@@ -3,7 +3,84 @@
 
 #include "GameplayAbilities/ShishaGameplayAbility.h"
 
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemLog.h"
+
 AShishaCharacterBase* UShishaGameplayAbility::GetCharacterFromActorInfo() const
 {
 	return (CurrentActorInfo ? Cast<AShishaCharacterBase>(CurrentActorInfo->AvatarActor.Get()) : nullptr);
+}
+
+void UShishaGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	const FGameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemComponent->MakeEffectContext();
+
+	for(const TSubclassOf<UGameplayEffect>& GameplayEffect : OngoingEffectsInstantiated)
+	{
+		if(!GameplayEffect.Get()) continue;
+
+		if(UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get())
+		{
+			FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+			if(SpecHandle.IsValid())
+			{
+				FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf((*SpecHandle.Data.Get()));
+				if(!ActiveHandle.WasSuccessfullyApplied())
+				{
+					ABILITY_LOG(Log, TEXT("Ability %s failed to apply startup effect %s"), *GetName(), *GetNameSafe(GameplayEffect));
+				}
+			}
+		}
+	}
+
+	if(IsInstantiated())
+	{
+		for(const TSubclassOf<UGameplayEffect>& GameplayEffect : OngoingEffects)
+		{
+			if(!GameplayEffect.Get()) continue;
+
+			if(UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get())
+			{
+				FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+				if(SpecHandle.IsValid())
+				{
+					FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf((*SpecHandle.Data.Get()));
+					if(!ActiveHandle.WasSuccessfullyApplied())
+					{
+						ABILITY_LOG(Log, TEXT("Ability %s failed to apply runtime effect %s"), *GetName(), *GetNameSafe(GameplayEffect));
+					}
+					else
+					{
+						RemoveOnEndEffectHandles.Add(ActiveHandle);
+					}
+				}	
+			}
+		}
+	}
+}
+
+void UShishaGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	if(IsInstantiated())
+	{
+		for(FActiveGameplayEffectHandle ActiveEffectHandle : RemoveOnEndEffectHandles)
+		{
+			if(ActiveEffectHandle.IsValid())
+			{
+				ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEffectHandle);
+			}
+		}
+
+		RemoveOnEndEffectHandles.Empty();
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+
 }

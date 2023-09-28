@@ -57,22 +57,9 @@ void UGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 			return;
 		}
 
-		CharacterJumpStart();
+		Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);	
 
-		if(UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get())
-		{
-			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-			FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(JumpEffect, 1, EffectContext);
-			if(SpecHandle.IsValid())
-			{
-				const FActiveGameplayEffectHandle ActiveEffect = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-				if(!ActiveEffect.WasSuccessfullyApplied())
-				{
-					const ACharacter* Character = GetCharacterFromActorInfo();
-					UE_LOG(LogTemp, Error, TEXT("Failed to apply jump effect %s"), *GetNameSafe(Character))
-				}
-			}
-		}
+		CharacterJumpStart();
 	}
 }
 
