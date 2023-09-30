@@ -29,7 +29,13 @@ struct FCharacterAnimationData
 	class UBlendSpace* MovementBlendspace = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
+	class UBlendSpace* CrouchMovementBlendspace = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
 	class UAnimSequenceBase* IdleAnimationAsset = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UAnimSequenceBase* IdleCrouchAnimationAsset = nullptr;
 };
 
 UENUM(BlueprintType)
