@@ -81,6 +81,9 @@ public:
 	void OnJumpActionStarted();
 	void OnJumpActionStopped();
 
+	void OnCrouchActionStarted();
+	void OnCrouchActionStopped();
+
 	/*virtual void Jump() override;*/
 
 	//Remove all effects with InAir tag
@@ -95,6 +98,8 @@ protected:
 	void OnRep_CharacterData();
 
 	virtual void InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication = false);
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProperties);
 
@@ -108,7 +113,12 @@ protected:
 	FGameplayTag JumpEventTag;
 
 	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagContainer CrouchTags;
+
+	UPROPERTY(EditDefaultsOnly)
 	FGameplayTagContainer InAirTags;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> CrouchStateEffect;
 
 };

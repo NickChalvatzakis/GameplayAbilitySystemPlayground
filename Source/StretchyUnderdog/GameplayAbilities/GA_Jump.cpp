@@ -20,12 +20,6 @@ bool UGA_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
 	FGameplayTagContainer* OptionalRelevantTags) const
 {
-
-	if (!ActorInfo || !ActorInfo->AvatarActor.IsValid())
-	{
-		return false;
-	}
-
 	const ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
 	if(!Character || !Character->CanJump())
 	{

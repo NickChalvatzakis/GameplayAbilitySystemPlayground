@@ -172,6 +172,24 @@ void AShishaCharacterBase::OnJumpActionStopped()
 	// StopJump();
 }
 
+void AShishaCharacterBase::OnCrouchActionStarted()
+{
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->TryActivateAbilitiesByTag(CrouchTags, true);
+	}
+}
+
+void AShishaCharacterBase::OnCrouchActionStopped()
+{
+	if(AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAbilities(&CrouchTags);
+	}
+}
+
+
+
 UFootstepsComponent* AShishaCharacterBase::GetFootstepsComponent() const
 {
 	return FootstepsComponent;
@@ -184,6 +202,36 @@ void AShishaCharacterBase::OnRep_CharacterData()
 
 void AShishaCharacterBase::InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication)
 {
+}
+
+void AShishaCharacterBase::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+
+	if(!CrouchStateEffect.Get()) return;
+
+	if(AbilitySystemComponent)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(CrouchStateEffect, 1, EffectContext);
+		if(SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveHandle = ApplyGameplayEffectToSelf(CrouchStateEffect, EffectContext);
+			if(!ActiveHandle.WasSuccessfullyApplied())
+			{
+				ABILITY_LOG(Log, TEXT("Ability %s failed to apply crouch effect %s"), *GetName(), *GetNameSafe(CrouchStateEffect));
+			}
+		}
+	}
+}
+
+void AShishaCharacterBase::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if(AbilitySystemComponent && !CrouchStateEffect.Get())
+	{
+		AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(CrouchStateEffect, AbilitySystemComponent);
+	}
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 }
 
 void AShishaCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)
