@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "GasExtension",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "Nick Chalvatzakis",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "GasExtension",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

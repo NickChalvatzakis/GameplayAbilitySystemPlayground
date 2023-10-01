@@ -13,16 +13,6 @@
 				"Engine",
 				"PhysicsCore"
 			]
-		},
-		{
-			"Name": "ExtendedGAS",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"GameplayAbilities",
-				"Engine",
-				"PhysicsCore"
-			]
 		}
 	],
 	"Plugins": [
