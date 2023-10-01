@@ -101,22 +101,22 @@ protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProperties);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="GasExtension")
 	class UCharacterDataAsset* CharacterDataAsset;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category="GasExtension")
 	class UFootstepsComponent* FootstepsComponent;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="GasExtension")
 	FGameplayTag JumpEventTag;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="GasExtension")
 	FGameplayTagContainer CrouchTags;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="GasExtension")
 	FGameplayTagContainer InAirTags;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="GasExtension")
 	TSubclassOf<UGameplayEffect> CrouchStateEffect;
 
 };
